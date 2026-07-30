@@ -1,0 +1,38 @@
+{
+  "name": "management-research-kb",
+  "version": "0.1.0",
+  "description": "Local Zotero and Obsidian retrieval for evidence-grounded management research.",
+  "author": {
+    "name": "muyunping123",
+    "url": "https://github.com/muyunping123"
+  },
+  "homepage": "https://github.com/muyunping123/management-research-kb",
+  "repository": "https://github.com/muyunping123/management-research-kb",
+  "license": "MIT",
+  "keywords": [
+    "zotero",
+    "obsidian",
+    "research",
+    "management-science",
+    "rag"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Management Research KB",
+    "shortDescription": "Ground management research in local literature.",
+    "longDescription": "Indexes local Obsidian PDFs and Zotero metadata, builds linked knowledge notes, and orchestrates two evidence-aware Codex agents for ideation and writing.",
+    "developerName": "muyunping123",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Build linked knowledge notes from my local literature folders.",
+      "Use my knowledge base to develop a management research idea.",
+      "Draft an evidence-grounded paper section from my local sources."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}

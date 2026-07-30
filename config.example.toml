@@ -1,0 +1,20 @@
+# Public runtime template. Put real values in a private, untracked config.
+# The vault is the local PDF discovery root; PDFs are grouped by their parent
+# directory relative to this path.
+vault_path = "C:/absolute/path/to/ObsidianVault"
+
+# Optional. Keep manuscript projects outside the vault.
+manuscripts_root = "C:/absolute/path/to/ResearchProjects"
+
+# Relative directory inside vault_path for generated category notes.
+notes_dir = "知识笔记"
+
+# Keep the derived index outside Obsidian, OneDrive, and other synced folders.
+cache_dir = "C:/absolute/path/to/local/management-research-kb-cache"
+
+# Zotero local API loopback endpoint. Zotero remains an independent source.
+zotero_base_url = "http://127.0.0.1:23119"
+
+# Bounded retrieval settings used by the local MCP service.
+max_group_documents = 20
+max_chars = 120000

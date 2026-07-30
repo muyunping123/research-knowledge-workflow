@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "management-research-kb": {
+      "type": "stdio",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./scripts/run-mcp.ps1"
+      ]
+    }
+  }
+}

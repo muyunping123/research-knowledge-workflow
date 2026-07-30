@@ -1,0 +1,67 @@
+# Private runtime configuration and credentials
+config.toml
+config.local.toml
+config.*.toml
+!config.example.toml
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local knowledge bases, generated notes, and manuscripts
+/vault/
+/obsidian/
+/obsidian-vault/
+/notes/
+/knowledge-notes/
+/generated-notes/
+/manuscripts/
+/corpus/
+/private/
+/private-data/
+/local-data/
+/exports/
+/evidence-packs/
+**/.obsidian/
+
+# Literature and reference exports
+*.pdf
+*.doc
+*.docx
+*.rtf
+*.tex
+*.bib
+*.ris
+*.enw
+
+# Local indexes and caches
+/cache/
+/.cache/
+/.local-cache/
+/.tools/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.jsonl
+*.parquet
+
+# Python and build artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+build/
+dist/
+*.egg-info/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/

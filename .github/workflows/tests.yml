@@ -1,0 +1,21 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: python -m pip install -e ".\mcp-server[test]"
+      - name: Test MCP service and stdio transport
+        run: python -m unittest discover -s .\mcp-server\tests -v
+      - name: Compile package
+        run: python -m compileall -q .\mcp-server\src
