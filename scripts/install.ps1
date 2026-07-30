@@ -29,13 +29,21 @@ $venvPython = Join-Path $venvRoot "Scripts\python.exe"
 & $venvPython -m pip install -e (Join-Path $pluginRoot "mcp-server")
 
 if (-not $ConfigPath) {
-    $ConfigPath = Join-Path $env:APPDATA "management-research-kb\config.toml"
+    $currentConfigPath = Join-Path $env:APPDATA "research-knowledge-workflow\config.toml"
+    $legacyConfigPath = Join-Path $env:APPDATA "management-research-kb\config.toml"
+    if (Test-Path -LiteralPath $currentConfigPath) {
+        $ConfigPath = $currentConfigPath
+    } elseif (Test-Path -LiteralPath $legacyConfigPath) {
+        $ConfigPath = $legacyConfigPath
+    } else {
+        $ConfigPath = $currentConfigPath
+    }
 }
 
 if ($VaultPath -and -not (Test-Path -LiteralPath $ConfigPath)) {
     $configDirectory = Split-Path -Parent $ConfigPath
     New-Item -ItemType Directory -Force -Path $configDirectory | Out-Null
-    $cacheDirectory = Join-Path $env:LOCALAPPDATA "management-research-kb"
+    $cacheDirectory = Join-Path $env:LOCALAPPDATA "research-knowledge-workflow"
     $escapedVault = $VaultPath.Replace("\", "\\")
     $escapedCache = $cacheDirectory.Replace("\", "\\")
     $lines = @(
@@ -55,4 +63,5 @@ if ($VaultPath -and -not (Test-Path -LiteralPath $ConfigPath)) {
 
 Write-Output "Python environment: $venvPython"
 Write-Output "Config path: $ConfigPath"
-Write-Output "Set MANAGEMENT_RESEARCH_KB_CONFIG to override the config path."
+Write-Output "Set RESEARCH_KNOWLEDGE_WORKFLOW_CONFIG to override the config path."
+Write-Output "Legacy MANAGEMENT_RESEARCH_KB_CONFIG remains supported."

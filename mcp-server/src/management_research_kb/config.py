@@ -11,8 +11,18 @@ from urllib.parse import urlparse
 from .errors import ConfigError
 
 
-CONFIG_ENV = "MANAGEMENT_RESEARCH_KB_CONFIG"
-DEFAULT_CONFIG_PATH = Path.home() / ".config" / "management-research-kb" / "config.toml"
+CONFIG_ENV = "RESEARCH_KNOWLEDGE_WORKFLOW_CONFIG"
+LEGACY_CONFIG_ENV = "MANAGEMENT_RESEARCH_KB_CONFIG"
+
+
+def _platform_config_path(app_name: str) -> Path:
+    if os.name == "nt" and os.environ.get("APPDATA"):
+        return Path(os.environ["APPDATA"]) / app_name / "config.toml"
+    return Path.home() / ".config" / app_name / "config.toml"
+
+
+DEFAULT_CONFIG_PATH = _platform_config_path("research-knowledge-workflow")
+LEGACY_DEFAULT_CONFIG_PATH = _platform_config_path("management-research-kb")
 
 
 def _is_within(path: Path, root: Path) -> bool:
@@ -90,13 +100,20 @@ class Config:
 
 
 def resolve_config_path(path: str | Path | None = None) -> Path:
-    """Resolve an explicit path, then the environment variable, then the default."""
+    """Resolve explicit, current, then legacy configuration locations."""
 
-    candidate = path or os.environ.get(CONFIG_ENV) or DEFAULT_CONFIG_PATH
+    candidate = path or os.environ.get(CONFIG_ENV) or os.environ.get(LEGACY_CONFIG_ENV)
+    if candidate is None:
+        candidate = (
+            DEFAULT_CONFIG_PATH
+            if DEFAULT_CONFIG_PATH.is_file() or not LEGACY_DEFAULT_CONFIG_PATH.is_file()
+            else LEGACY_DEFAULT_CONFIG_PATH
+        )
     resolved = Path(os.path.expandvars(os.path.expanduser(str(candidate)))).resolve()
     if not resolved.is_file():
         raise ConfigError(
-            f"Configuration file not found: {resolved}. Set {CONFIG_ENV} or pass --config."
+            f"Configuration file not found: {resolved}. Set {CONFIG_ENV}, "
+            f"legacy {LEGACY_CONFIG_ENV}, or pass --config."
         )
     return resolved
 

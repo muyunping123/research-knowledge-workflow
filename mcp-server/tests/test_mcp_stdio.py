@@ -176,7 +176,7 @@ class McpStdioSmokeTest(unittest.TestCase):
             )
             plugin_root = Path(__file__).resolve().parents[2]
             environment = dict(os.environ)
-            environment["MANAGEMENT_RESEARCH_KB_CONFIG"] = str(config)
+            environment["RESEARCH_KNOWLEDGE_WORKFLOW_CONFIG"] = str(config)
             parameters = StdioServerParameters(
                 command="powershell",
                 args=[

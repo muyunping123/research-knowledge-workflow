@@ -45,7 +45,7 @@ flowchart LR
 ## 项目结构
 
 ```text
-management-research-kb/
+research-knowledge-workflow/
 |- .codex-plugin/plugin.json
 |- .mcp.json
 |- skills/
@@ -59,7 +59,7 @@ management-research-kb/
 `- README.md
 ```
 
-仓库和 Python 包继续保留 `management-research-kb` 技术 ID，以兼容现有安装路径和本地配置；面向用户的通用 Skill 调用名为 `$research-knowledge-workflow`。
+仓库、Plugin、Skill 与 MCP 统一使用 `research-knowledge-workflow`。旧版 `%APPDATA%\management-research-kb\config.toml` 和 `MANAGEMENT_RESEARCH_KB_CONFIG` 环境变量仍可回退读取，已有本地配置不必立即迁移。
 
 ## 使用条件
 
@@ -81,7 +81,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install.ps1 `
   -ManuscriptsRoot "C:\path\to\your\paper-projects"
 ```
 
-安装脚本会创建隔离的 Python 环境，将私有配置写入 `%APPDATA%\management-research-kb\config.toml`，并把 SQLite 派生缓存保存在 `%LOCALAPPDATA%`。将仓库添加为本地 Codex Plugin 后，重新加载 Codex 并新建任务，使 Skill 与 MCP 重新发现。
+安装脚本会创建隔离的 Python 环境，将新配置写入 `%APPDATA%\research-knowledge-workflow\config.toml`，并把 SQLite 派生缓存保存在 `%LOCALAPPDATA%\research-knowledge-workflow`。将仓库添加为本地 Codex Plugin 后，重新加载 Codex 并新建任务，使 Skill 与 MCP 重新发现。
 
 首次运行建议只同步一个相对目录，例如 `机器学习/多视图/渐进融合`，确认预览符合预期后再扩大范围。
 
@@ -96,6 +96,54 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install.ps1 `
 - `zotero_base_url`：Zotero 本地只读 API 地址。
 
 `.mcp.json` 将 MCP 注册为 `research-knowledge-workflow`。安装或更新插件后需要重新加载 Codex。
+
+## 快速使用流程
+
+下面是一条从“本地已有论文”到“形成研究思路并开始写作”的推荐路径。第一次使用时按顺序执行，后续只需从对应阶段进入。
+
+### 第一步：整理输入
+
+1. 把已下载的论文按研究主题放入 Obsidian Vault，例如 `机器学习/多视图/渐进融合/`。
+2. 文件名建议使用 `年份_标题.pdf`，方便人工浏览；工作流不会强制重命名已有文件。
+3. 在 Zotero 中继续维护题录、Collections、Tags 和 Better BibTeX 引用键。Zotero 与本地 PDF 不必完整一一对应。
+
+### 第二步：安装并检查连接
+
+运行安装脚本、重新加载 Codex 后，先输入：
+
+```text
+使用 $research-knowledge-workflow 检查知识库状态，只读取配置并报告 Obsidian、索引和 Zotero 的连接情况，不执行全库同步。
+```
+
+确认 Vault、缓存目录和 Zotero 状态正常后，再进入知识构建。Zotero 暂时不可用时仍可处理本地 PDF，只会把题录覆盖标记为不完整。
+
+### 第三步：构建主题知识笔记
+
+```text
+使用 $research-knowledge-workflow 的 build-knowledge 模式，同步“机器学习/多视图/渐进融合”目录，生成 Obsidian 主题笔记预览。保留页码、引用键和相关笔记链接，不要直接写入。
+```
+
+检查预览中的来源清单、综合结论、冲突和 `[[双向链接]]`。内容正确后回复“确认写入该笔记”，父任务才会重新校验目标并应用修改。
+
+### 第四步：提炼研究思路
+
+```text
+使用 $research-knowledge-workflow 的 ideate 模式，基于刚生成的主题笔记和原始论文，提出一个可检验的研究问题。输出问题背景、核心机制、最近邻工作、方法设计、验证或证伪路径，以及待补证据清单。
+```
+
+这一阶段固定由两个 Agent 基于同一证据包完成思路构建和证据约束审查。需要判断创新性时，工作流会记录外部检索范围；未完成检索则返回 `not_assessed`。
+
+### 第五步：辅助论文撰写
+
+```text
+使用 $research-knowledge-workflow 的 write 模式，根据已确认的研究思路和 claim ledger 起草相关工作小节。关键主张附引用键和页码，证据不足处标记 [EVIDENCE_NEEDED]，先返回草稿，不修改源文件。
+```
+
+审阅草稿后，可继续使用 `audit` 模式检查论证、方法、引用和创新边界。只有明确指定目标文件并确认差异预览后，才应用到 Word、LaTeX 或 Markdown 正文。
+
+```text
+本地论文与 Zotero -> build-knowledge -> Obsidian 主题笔记 -> ideate -> 研究方案 -> write -> 论文草稿 -> audit -> 修订
+```
 
 ## 完整使用实例
 

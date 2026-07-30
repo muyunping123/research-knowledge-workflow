@@ -3,8 +3,8 @@ requires = ["setuptools>=75"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "management-research-kb-mcp"
-version = "0.2.0"
+name = "research-knowledge-workflow-mcp"
+version = "0.3.0"
 description = "Read-first local MCP server for an Obsidian, PDF, and Zotero research knowledge base"
 readme = "README.md"
 requires-python = ">=3.11"

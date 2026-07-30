@@ -10,15 +10,15 @@ group knowledge notes only after an explicit `apply=true` call.
 python -m venv .venv
 .venv\Scripts\python -m pip install -e ".[test]"
 Copy-Item config.example.toml config.toml
-$env:MANAGEMENT_RESEARCH_KB_CONFIG = (Resolve-Path .\config.toml)
-.venv\Scripts\python -m management_research_kb
+$env:RESEARCH_KNOWLEDGE_WORKFLOW_CONFIG = (Resolve-Path .\config.toml)
+& .venv\Scripts\research-knowledge-workflow-mcp.exe
 ```
 
 The server uses stdio. Logs go to stderr; stdout is reserved for MCP protocol
 messages. An explicit config can also be supplied with `--config`:
 
 ```powershell
-.venv\Scripts\python -m management_research_kb --config C:\path\to\config.toml
+& .venv\Scripts\research-knowledge-workflow-mcp.exe --config C:\path\to\config.toml
 ```
 
 The SQLite index is derived data and must be outside the Obsidian vault. PDF

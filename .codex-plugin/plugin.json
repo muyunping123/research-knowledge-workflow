@@ -1,13 +1,13 @@
 {
-  "name": "management-research-kb",
-  "version": "0.2.0",
+  "name": "research-knowledge-workflow",
+  "version": "0.3.0",
   "description": "Connect Obsidian, Zotero, local papers, and Codex for evidence-grounded research ideation and writing.",
   "author": {
     "name": "muyunping123",
     "url": "https://github.com/muyunping123"
   },
-  "homepage": "https://github.com/muyunping123/management-research-kb",
-  "repository": "https://github.com/muyunping123/management-research-kb",
+  "homepage": "https://github.com/muyunping123/research-knowledge-workflow",
+  "repository": "https://github.com/muyunping123/research-knowledge-workflow",
   "license": "MIT",
   "keywords": [
     "zotero",

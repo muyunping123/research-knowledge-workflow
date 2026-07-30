@@ -10,7 +10,7 @@ manuscripts_root = "C:/absolute/path/to/ResearchProjects"
 notes_dir = "知识笔记"
 
 # Keep the derived index outside Obsidian, OneDrive, and other synced folders.
-cache_dir = "C:/absolute/path/to/local/management-research-kb-cache"
+cache_dir = "C:/absolute/path/to/local/research-knowledge-workflow-cache"
 
 # Zotero local API loopback endpoint. Zotero remains an independent source.
 zotero_base_url = "http://127.0.0.1:23119"

@@ -5,8 +5,16 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
-from management_research_kb.config import Config, ConfigError, load_config
+from management_research_kb.config import (
+    CONFIG_ENV,
+    LEGACY_CONFIG_ENV,
+    Config,
+    ConfigError,
+    load_config,
+    resolve_config_path,
+)
 from management_research_kb.errors import PathSafetyError
 from management_research_kb.indexer import ExtractedPdf
 from management_research_kb.service import KnowledgeBaseService
@@ -298,6 +306,26 @@ class KnowledgeBaseTestCase(unittest.TestCase):
 
 
 class StandaloneHelpersTestCase(unittest.TestCase):
+    def test_current_config_environment_precedes_legacy_fallback(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            current = root / "current.toml"
+            legacy = root / "legacy.toml"
+            current.write_text("# current\n", encoding="utf-8")
+            legacy.write_text("# legacy\n", encoding="utf-8")
+
+            with mock.patch.dict(
+                os.environ,
+                {CONFIG_ENV: str(current), LEGACY_CONFIG_ENV: str(legacy)},
+            ):
+                self.assertEqual(resolve_config_path(), current.resolve())
+
+            with mock.patch.dict(
+                os.environ,
+                {CONFIG_ENV: "", LEGACY_CONFIG_ENV: str(legacy)},
+            ):
+                self.assertEqual(resolve_config_path(), legacy.resolve())
+
     def test_config_defaults_and_external_cache_validation(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

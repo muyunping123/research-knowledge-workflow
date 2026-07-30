@@ -4,7 +4,9 @@ $pluginRoot = Split-Path -Parent $PSScriptRoot
 $venvPython = Join-Path $pluginRoot ".venv\Scripts\python.exe"
 $bundledPython = Join-Path $env:USERPROFILE ".cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe"
 
-if ($env:MANAGEMENT_RESEARCH_KB_PYTHON) {
+if ($env:RESEARCH_KNOWLEDGE_WORKFLOW_PYTHON) {
+    $python = $env:RESEARCH_KNOWLEDGE_WORKFLOW_PYTHON
+} elseif ($env:MANAGEMENT_RESEARCH_KB_PYTHON) {
     $python = $env:MANAGEMENT_RESEARCH_KB_PYTHON
 } elseif (Test-Path -LiteralPath $venvPython) {
     $python = $venvPython

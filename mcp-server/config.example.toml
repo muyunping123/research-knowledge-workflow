@@ -1,7 +1,7 @@
 vault_path = "C:/Users/your-name/OneDrive/research/literature"
 manuscripts_root = "C:/Users/your-name/OneDrive/research/manuscripts"
 notes_dir = "知识笔记"
-cache_dir = "C:/Users/your-name/AppData/Local/management-research-kb"
+cache_dir = "C:/Users/your-name/AppData/Local/research-knowledge-workflow"
 zotero_base_url = "http://127.0.0.1:23119"
 max_group_documents = 20
 max_chars = 120000
