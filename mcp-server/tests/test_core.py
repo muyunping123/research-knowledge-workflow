@@ -177,6 +177,27 @@ class KnowledgeBaseTestCase(unittest.TestCase):
         full = self.service.kb_sync()
         self.assertEqual(full["counts"]["discovered"], 2)
 
+    def test_sync_uses_one_resolved_vault_root_for_relative_paths(self):
+        self.add_pdf("机器学习/多视图/2024_Aliased Root.pdf")
+        alias_directory = self.vault.parent / "path-alias"
+        alias_directory.mkdir()
+        aliased_config = Config(
+            vault_path=alias_directory / ".." / "vault",
+            cache_dir=self.vault.parent / "aliased-cache",
+        )
+        service = KnowledgeBaseService(
+            aliased_config,
+            extractor=lambda path: ExtractedPdf(["Aliased root evidence. " * 20]),
+            zotero_client=StaticZotero(),
+        )
+
+        result = service.kb_sync()
+        self.assertEqual(result["counts"]["indexed"], 1)
+        self.assertEqual(
+            service.kb_list_groups()["groups"][0]["group_path"],
+            "机器学习/多视图",
+        )
+
     def test_search_group_batching_and_note_write_contract(self):
         self.add_pdf("机器学习/多视图/渐进融合/2024_Progressive Multiview Fusion.pdf")
         self.add_pdf("机器学习/因果/2023_Causal Learning.pdf")

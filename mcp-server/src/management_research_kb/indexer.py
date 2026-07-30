@@ -124,9 +124,10 @@ class PdfIndexer:
         skipped: list[str] = []
         errors: list[dict[str, str]] = []
         current_paths: set[str] = set()
+        vault = self.config.vault_path.resolve()
 
         for path in discover_pdfs(self.config, normalized_group):
-            relative_path = path.relative_to(self.config.vault_path).as_posix()
+            relative_path = path.relative_to(vault).as_posix()
             current_paths.add(relative_path)
             stat = path.stat()
             existing = self.database.get_by_relative_path(relative_path)
@@ -164,7 +165,7 @@ class PdfIndexer:
             if not doi:
                 doi = find_doi("\n".join(pdf_metadata.values()))
 
-            group_path = path.parent.relative_to(self.config.vault_path).as_posix()
+            group_path = path.parent.relative_to(vault).as_posix()
             if group_path == ".":
                 group_path = ""
             metadata = {
