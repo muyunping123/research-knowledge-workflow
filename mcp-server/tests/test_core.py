@@ -109,7 +109,7 @@ class KnowledgeBaseTestCase(unittest.TestCase):
             if "扫描" in path.name:
                 return ExtractedPdf(["", ""])
             text = (
-                "Progressive multiview fusion supports management prediction. "
+                "Progressive multiview fusion supports robust prediction. "
                 "DOI 10.1000/test.1. "
             ) * 8
             return ExtractedPdf([text, "Second page discusses robust evidence. " * 8])
@@ -203,7 +203,7 @@ class KnowledgeBaseTestCase(unittest.TestCase):
         self.add_pdf("机器学习/因果/2023_Causal Learning.pdf")
         self.service.kb_sync()
 
-        search = self.service.kb_search("management prediction")
+        search = self.service.kb_search("robust prediction")
         self.assertGreaterEqual(search["count"], 1)
         fulltext_hits = [hit for hit in search["hits"] if hit["page"]]
         self.assertEqual(fulltext_hits[0]["locator"], "p. 1")

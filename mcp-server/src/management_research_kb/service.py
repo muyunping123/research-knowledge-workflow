@@ -584,7 +584,7 @@ class KnowledgeBaseService:
             "status: reviewed",
             f"generated_at: {yaml_scalar(indexed_at)}",
             f"updated_at: {yaml_scalar(indexed_at)}",
-            "generated_by: management-research-kb",
+            "generated_by: research-knowledge-workflow",
             "aliases: []",
             "tags: []",
             "source_pdfs:",

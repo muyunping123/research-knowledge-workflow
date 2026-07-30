@@ -12,7 +12,7 @@ Use stable IDs so every drafted assertion can be traced back to a retrieved sour
 | `note_lead` | Query expansion, concept navigation, and candidate source discovery | Final evidentiary support |
 | `project_context` | Preserve the manuscript's current argument, wording, citations, and formatting constraints | Independent validation of manuscript claims |
 
-`ai4management` output and subagent reasoning are not evidence levels. Store them as analysis artifacts, not evidence items.
+Domain-skill output, including `ai4management`, and subagent reasoning are not evidence levels. Store them as analysis artifacts, not evidence items.
 
 ## Frozen Evidence Pack
 
@@ -70,7 +70,7 @@ content:
   paraphrase: ""
   minimal_excerpt: null
 provenance:
-  retrieved_via: "management-research-kb | gs-search | gs-fulltext | academic-search"
+  retrieved_via: "research-knowledge-workflow | gs-search | gs-fulltext | academic-search"
   retrieved_at: "ISO-8601 timestamp"
   identity_confidence: "exact | strong | probable | unmatched | conflict"
   text_quality: "native | ocr | partial | unavailable"

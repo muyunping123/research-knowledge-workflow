@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "management-research-kb": {
+    "research-knowledge-workflow": {
       "type": "stdio",
       "command": "powershell",
       "args": [

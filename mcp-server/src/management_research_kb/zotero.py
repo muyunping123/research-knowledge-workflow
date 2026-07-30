@@ -61,7 +61,7 @@ class ZoteroClient:
         self.headers = {
             "Accept": "application/json",
             "Zotero-API-Version": "3",
-            "User-Agent": "management-research-kb-mcp/0.1",
+            "User-Agent": "research-knowledge-workflow-mcp/0.2",
         }
 
     def status(self) -> dict[str, Any]:

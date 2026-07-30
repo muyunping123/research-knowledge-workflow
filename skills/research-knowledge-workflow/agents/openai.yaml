@@ -1,0 +1,13 @@
+interface:
+  display_name: "Research Knowledge Workflow"
+  short_description: "Connect Obsidian, Zotero, and local papers for research"
+  default_prompt: "Use $research-knowledge-workflow to build linked knowledge notes or support research ideation and paper writing with two evidence-checking agents."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "research-knowledge-workflow"
+      description: "Access configured local PDFs, Obsidian notes, Zotero metadata, and manuscript context"
+
+policy:
+  allow_implicit_invocation: true

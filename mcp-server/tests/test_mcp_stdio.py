@@ -97,7 +97,10 @@ class McpStdioSmokeTest(unittest.TestCase):
             parameters = StdioServerParameters(command=sys.executable, args=arguments)
             async with stdio_client(parameters) as (read_stream, write_stream):
                 async with ClientSession(read_stream, write_stream) as session:
-                    await session.initialize()
+                    initialized = await session.initialize()
+                    self.assertEqual(
+                        initialized.serverInfo.name, "research-knowledge-workflow"
+                    )
                     listed = await session.list_tools()
                     names = {tool.name for tool in listed.tools}
                     self.assertEqual(

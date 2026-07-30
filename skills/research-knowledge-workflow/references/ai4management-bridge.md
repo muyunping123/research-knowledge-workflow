@@ -1,15 +1,15 @@
-# ai4management Bridge
+# Optional ai4management Adapter
 
-Use the installed `$ai4management` skill as a management-research reasoning and audit rubric. It is not a database, source, citation, or evidence item.
+Use the installed `$ai4management` skill only when the user requests it or the active task belongs to management, business, information systems, operations, marketing, finance, or a related interdisciplinary setting. It is a reasoning and audit rubric, not a database, source, citation, or evidence item.
 
-## Attach the Rubric
+## Attach the Adapter
 
-For `ideate`, `write`, and `audit` modes, instruct both research agents to load and apply `$ai4management`:
+For applicable `ideate`, `write`, and `audit` runs, add `$ai4management` to both existing role briefs:
 
-- **Idea Builder** uses it primarily for management story, theory, research question, method logic, novelty comparison, falsification, and venue fit.
-- **Evidence-Constrained Writer** uses it to keep the prose centered on the decision problem, mechanism, contribution, and audience while enforcing the claim ledger.
+- **Idea Builder** uses it for the managerial phenomenon, decision problem, theory or mechanism, research question, method logic, novelty comparison, falsification, and venue fit.
+- **Evidence-Constrained Writer** uses it to keep prose centered on the decision maker, mechanism, contribution, and audience while enforcing the claim ledger.
 
-Do not start a separate ai4management agent. The two required workers remain the only subagents.
+Do not start a separate ai4management agent. The two required workers remain the only subagents. For non-management tasks, skip this adapter and use the general role contracts.
 
 ## Input Mapping
 
@@ -35,7 +35,7 @@ known_context:
   closest_work_evidence_ids: []
 ```
 
-If the central management story cannot be inferred, return at most three focused clarification questions rather than manufacturing a context.
+If the central management context cannot be inferred, return at most three focused clarification questions rather than manufacturing one.
 
 ## Evidence Boundary
 
@@ -49,18 +49,17 @@ If the central management story cannot be inferred, return at most three focused
 
 Before evaluating novelty, the parent must perform and trace an external scholarly search. Compare the closest verified work on:
 
-- management setting;
-- decision maker and decision variable;
-- managerial tension or phenomenon;
+- management setting and decision maker;
+- decision variable and managerial tension;
 - mechanism or theory;
-- method;
-- data and unit of analysis;
+- method and data;
+- unit of analysis;
 - validation or identification design.
 
 Use only these verdicts:
 
 - `not_assessed`: external verification is incomplete.
-- `collision`: closest work covers the central management problem and mechanism.
+- `collision`: closest work covers the central problem and mechanism.
 - `weak_delta`: a difference exists but does not yet support a clear contribution.
 - `provisionally_distinct`: verified closest work differs on multiple material axes within the documented search boundary.
 
@@ -100,4 +99,4 @@ Tie every reason to claim IDs or clearly label it as rubric-based reasoning.
 
 ## Degraded Operation
 
-If `$ai4management` cannot be loaded, mark its checks `not_run` and report the missing dependency. Do not silently imitate its verdicts or describe the audit as complete.
+If a management task requests `$ai4management` but it cannot be loaded, mark its checks `not_run` and report the missing optional dependency. Continue the general evidence workflow when useful, but do not imitate ai4management verdicts or describe the domain audit as complete.

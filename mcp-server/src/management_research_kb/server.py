@@ -22,7 +22,7 @@ logging.basicConfig(
 LOGGER = logging.getLogger(__name__)
 
 mcp = FastMCP(
-    "management-research-kb",
+    "research-knowledge-workflow",
     instructions=(
         "Read-first access to local Obsidian PDFs, derived page evidence, Zotero metadata, "
         "and explicitly approved group knowledge-note writes. Metadata-only records are leads, "
@@ -232,11 +232,11 @@ def kb_project_context(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Management Research KB MCP stdio server")
+    parser = argparse.ArgumentParser(description="Research Knowledge Workflow MCP stdio server")
     parser.add_argument("--config", help="Path to the TOML configuration file")
     arguments = parser.parse_args()
     configure(arguments.config)
-    LOGGER.info("Starting management-research-kb over stdio")
+    LOGGER.info("Starting research-knowledge-workflow over stdio")
     mcp.run(transport="stdio")
 
 

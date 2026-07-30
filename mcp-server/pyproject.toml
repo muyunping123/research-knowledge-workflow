@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "management-research-kb-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "Read-first local MCP server for an Obsidian, PDF, and Zotero research knowledge base"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -17,6 +17,7 @@ dependencies = [
 test = ["pytest>=8,<10"]
 
 [project.scripts]
+research-knowledge-workflow-mcp = "management_research_kb.server:main"
 management-research-kb-mcp = "management_research_kb.server:main"
 
 [tool.setuptools.packages.find]

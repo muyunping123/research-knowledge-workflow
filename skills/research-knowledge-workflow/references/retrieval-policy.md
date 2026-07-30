@@ -79,9 +79,9 @@ If the abstract cannot be verified, retain the item as `metadata_only` and recor
 
 Local absence never establishes novelty. Before writing a novelty claim:
 
-1. Expand the query across management constructs, decision problem, technical mechanism, synonyms, and adjacent terminology.
+1. Expand the query across the research object, problem formulation, concepts or theory, technical mechanism, synonyms, and adjacent terminology.
 2. Search external scholarly indexes and verify the closest candidates at least at abstract level.
-3. Compare the active idea with the closest work on management setting, decision variable, mechanism, theory, method, data, and validation design.
+3. Compare the active idea with the closest work on problem setting, research object, mechanism or theory, method, data, evaluation or identification design, and claimed contribution.
 4. Record query strings, sources, dates, filters, closest-work IDs, and coverage limitations.
 
 Use `not_assessed` when external verification is incomplete. Even a provisionally distinct result must be bounded by the searched sources and date.

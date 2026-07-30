@@ -40,13 +40,15 @@ Do not switch roles during an invocation.
 
 ### Idea Builder
 
-- Use `$ai4management` as a reasoning rubric for management story, theory, novelty, method logic, falsifiability, and venue fit.
-- Generate or audit a focused research contribution from evidence IDs.
+- Define or audit the research problem, conceptual or theoretical logic, closest-work boundary, method fit, validation, falsifiability, and contribution.
+- Use a requested domain Skill as an optional reasoning rubric inside this role. For management-related work, apply `$ai4management` according to `ai4management-bridge.md`.
+- Generate or audit a focused research contribution from evidence IDs without treating rubric output as evidence.
 - Distinguish evidence-backed prior work from proposed mechanisms and hypotheses.
 
 ### Evidence-Constrained Writer
 
-- Use `$ai4management` to preserve the management argument while drafting or auditing.
+- Preserve the research argument, disciplinary terminology, and target audience while drafting or auditing.
+- When a domain Skill is active, apply its writing checks inside this role without creating another agent.
 - Bind every material sentence to claim IDs, evidence IDs, citekeys, and locators.
 - Flag unsupported, overclaimed, contradictory, or project-incompatible text.
 - Preserve the target project's terminology and citation conventions.
@@ -55,7 +57,7 @@ Do not switch roles during an invocation.
 
 Only the parent may:
 
-- call the `management-research-kb` MCP or scholarly-search skills;
+- call the `research-knowledge-workflow` MCP or scholarly-search skills;
 - select and normalize sources;
 - freeze, version, and hash evidence packs;
 - decide whether retrieval is sufficient;

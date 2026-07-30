@@ -1,4 +1,4 @@
-# Management Research KB MCP Server
+# Research Knowledge Workflow MCP Server
 
 A local, read-first MCP server that indexes PDFs beneath an Obsidian vault,
 queries Zotero through its local read-only API, and materializes agent-written
