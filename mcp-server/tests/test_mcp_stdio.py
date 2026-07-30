@@ -109,6 +109,7 @@ class McpStdioSmokeTest(unittest.TestCase):
                             "kb_status",
                             "kb_sync",
                             "kb_list_groups",
+                            "kb_prepare_topic",
                             "kb_get_knowledge_note",
                             "kb_search_notes",
                             "kb_search",
@@ -127,6 +128,15 @@ class McpStdioSmokeTest(unittest.TestCase):
                     self.assertFalse(result.isError)
                     synced = await session.call_tool("kb_sync", {"group_path": group})
                     self.assertFalse(synced.isError)
+                    prepared = await session.call_tool(
+                        "kb_prepare_topic",
+                        {
+                            "query": "progressive fusion",
+                            "max_groups": 1,
+                            "max_chars_per_group": 500,
+                        },
+                    )
+                    self.assertFalse(prepared.isError)
                     searched = await session.call_tool(
                         "kb_search", {"query": "page-addressable", "group_path": group}
                     )

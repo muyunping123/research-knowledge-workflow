@@ -185,6 +185,40 @@ class KnowledgeBaseTestCase(unittest.TestCase):
         full = self.service.kb_sync()
         self.assertEqual(full["counts"]["discovered"], 2)
 
+    def test_prepare_topic_discovers_unindexed_group_and_stages_note_context(self):
+        target = "运营管理/营销/需求-销量预测"
+        target_pdf = "2024_MEMF Multimodal Marketing Sales.pdf"
+        self.add_pdf(f"{target}/{target_pdf}")
+        self.add_pdf(
+            "应用场景/谣言检测/多模态信息/2024_Multimodal Misinformation.pdf"
+        )
+        self.add_pdf("机器学习/多视图/2023_Outside Paper.pdf")
+
+        prepared = self.service.kb_prepare_topic(
+            "多模态营销",
+            search_terms=["multimodal", "marketing", "sales"],
+            required_terms=["营销", "marketing", "sales", "commerce"],
+            max_groups=1,
+            max_chars_per_group=120,
+        )
+
+        self.assertEqual(prepared["status"], "ok")
+        self.assertEqual(prepared["selected_group_count"], 1)
+        group = prepared["prepared_groups"][0]
+        self.assertEqual(group["group_path"], target)
+        self.assertEqual(group["knowledge_note_status"], "missing")
+        self.assertTrue(group["requires_note_synthesis"])
+        self.assertIn("robust prediction", group["context"]["rendered_context"])
+        self.assertEqual(self.extract_calls, [target_pdf])
+        self.assertEqual(
+            [item["group_path"] for item in self.service.kb_list_groups()["groups"]],
+            [target],
+        )
+        self.assertFalse(self.config.notes_path.exists())
+        self.assertEqual(prepared["pending_knowledge_notes"], [group["knowledge_note"]])
+        self.assertFalse(prepared["rules"]["whole_vault_fulltext_sync_performed"])
+        self.assertFalse(prepared["rules"]["knowledge_notes_written"])
+
     def test_sync_uses_one_resolved_vault_root_for_relative_paths(self):
         self.add_pdf("机器学习/多视图/2024_Aliased Root.pdf")
         alias_directory = self.vault.parent / "path-alias"

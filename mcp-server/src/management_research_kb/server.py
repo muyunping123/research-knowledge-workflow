@@ -72,6 +72,27 @@ def kb_list_groups() -> dict[str, Any]:
 
 
 @mcp.tool()
+def kb_prepare_topic(
+    query: str,
+    search_terms: list[str] | None = None,
+    required_terms: list[str] | None = None,
+    max_groups: int = 3,
+    max_matches_per_group: int = 10,
+    max_chars_per_group: int = 20_000,
+) -> dict[str, Any]:
+    """Find topic PDFs across the vault, selectively index groups, and return note evidence."""
+
+    return get_service().kb_prepare_topic(
+        query,
+        search_terms=search_terms,
+        required_terms=required_terms,
+        max_groups=max_groups,
+        max_matches_per_group=max_matches_per_group,
+        max_chars_per_group=max_chars_per_group,
+    )
+
+
+@mcp.tool()
 def kb_get_knowledge_note(
     group_path: str, max_chars: int | None = None
 ) -> dict[str, Any]:

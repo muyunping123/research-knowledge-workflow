@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "research-knowledge-workflow-mcp"
-version = "0.3.0"
+version = "0.4.0"
 description = "Read-first local MCP server for an Obsidian, PDF, and Zotero research knowledge base"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -14,10 +14,11 @@ from xml.etree import ElementTree
 from .config import Config
 from .database import Database, EVIDENCE_LEVELS
 from .errors import KnowledgeBaseError, PathSafetyError, ZoteroUnavailable
-from .indexer import PdfExtractor, PdfIndexer
+from .indexer import PdfExtractor, PdfIndexer, discover_pdfs
 from .utils import (
     canonical_hash,
     ensure_within,
+    infer_year_title,
     knowledge_note_filename,
     normalize_group_path,
     normalize_title,
@@ -149,6 +150,206 @@ class KnowledgeBaseService:
                 }
             )
         return {"status": "ok", "count": len(groups), "groups": groups}
+
+    def kb_prepare_topic(
+        self,
+        query: str,
+        *,
+        search_terms: Sequence[str] | None = None,
+        required_terms: Sequence[str] | None = None,
+        max_groups: int = 3,
+        max_matches_per_group: int = 10,
+        max_chars_per_group: int = 20_000,
+    ) -> dict[str, Any]:
+        """Discover unindexed topic PDFs, selectively index groups, and stage note evidence."""
+
+        clean_query = query.strip()
+        if not clean_query:
+            raise KnowledgeBaseError("query cannot be empty")
+        group_limit = max(1, min(int(max_groups), 8))
+        match_limit = max(1, min(int(max_matches_per_group), 50))
+        context_limit = max(
+            1, min(int(max_chars_per_group), self.config.max_chars)
+        )
+
+        terms: list[str] = []
+        for value in [clean_query, *(search_terms or [])]:
+            term = str(value).strip()
+            if term and term.casefold() not in {item.casefold() for item in terms}:
+                terms.append(term)
+            if len(terms) >= 20:
+                break
+        term_tokens = {
+            term: tokenize_for_similarity(term)
+            for term in terms
+            if tokenize_for_similarity(term)
+        }
+        required: list[str] = []
+        for value in required_terms or []:
+            term = str(value).strip()
+            if term and term.casefold() not in {item.casefold() for item in required}:
+                required.append(term)
+            if len(required) >= 20:
+                break
+        required_tokens = {
+            term: tokenize_for_similarity(term)
+            for term in required
+            if tokenize_for_similarity(term)
+        }
+        query_tokens = tokenize_for_similarity(clean_query)
+        all_tokens = set().union(*term_tokens.values()) if term_tokens else set()
+        vault = self.config.vault_path.resolve()
+        discovered = discover_pdfs(self.config)
+        grouped: dict[str, dict[str, Any]] = {}
+
+        for path in discovered:
+            relative_path = path.relative_to(vault).as_posix()
+            group_path = path.parent.relative_to(vault).as_posix()
+            if group_path == ".":
+                group_path = ""
+            year, title = infer_year_title(path.name)
+            searchable = f"{group_path} {path.name} {title}"
+            candidate_tokens = tokenize_for_similarity(searchable)
+            shared = all_tokens & candidate_tokens
+            primary_shared = query_tokens & candidate_tokens
+            matched_terms: list[str] = []
+            matched_required_terms: list[str] = []
+            best_term_coverage = 0.0
+            normalized_searchable = searchable.casefold()
+            for term, tokens in term_tokens.items():
+                overlap = tokens & candidate_tokens
+                coverage = len(overlap) / max(1, len(tokens))
+                best_term_coverage = max(best_term_coverage, coverage)
+                if term.casefold() in normalized_searchable or coverage >= 0.5:
+                    matched_terms.append(term)
+            for term, tokens in required_tokens.items():
+                overlap = tokens & candidate_tokens
+                coverage = len(overlap) / max(1, len(tokens))
+                if term.casefold() in normalized_searchable or coverage >= 0.5:
+                    matched_required_terms.append(term)
+            if required_tokens and not matched_required_terms:
+                continue
+            if not shared and not matched_terms:
+                continue
+
+            primary_coverage = len(primary_shared) / max(1, len(query_tokens))
+            similarity = len(shared) / math.sqrt(
+                max(1, len(all_tokens)) * max(1, len(candidate_tokens))
+            )
+            term_coverage = len(matched_terms) / max(1, len(term_tokens))
+            score = (
+                0.20 * primary_coverage
+                + 0.25 * best_term_coverage
+                + 0.40 * term_coverage
+                + 0.15 * similarity
+            )
+            record = {
+                "relative_path": relative_path,
+                "filename": path.name,
+                "inferred_title": title,
+                "year": year,
+                "score": round(score, 6),
+                "matched_terms": matched_terms,
+                "matched_required_terms": matched_required_terms,
+                "shared_terms": sorted(shared, key=lambda value: (len(value), value))[:16],
+            }
+            group = grouped.setdefault(
+                group_path,
+                {
+                    "group_path": group_path,
+                    "knowledge_note": knowledge_note_filename(group_path),
+                    "knowledge_note_exists": (
+                        self.config.notes_path / knowledge_note_filename(group_path)
+                    ).is_file(),
+                    "score": 0.0,
+                    "matched_pdf_count": 0,
+                    "matched_pdfs": [],
+                },
+            )
+            group["score"] = max(float(group["score"]), score)
+            group["matched_pdf_count"] = int(group["matched_pdf_count"]) + 1
+            group["matched_pdfs"].append(record)
+
+        candidates: list[dict[str, Any]] = []
+        for group in grouped.values():
+            group["score"] = round(
+                float(group["score"])
+                + min(0.05, 0.005 * max(0, int(group["matched_pdf_count"]) - 1)),
+                6,
+            )
+            group["matched_pdfs"].sort(
+                key=lambda item: (-float(item["score"]), str(item["relative_path"]))
+            )
+            group["matched_pdfs"] = group["matched_pdfs"][:match_limit]
+            candidates.append(group)
+        candidates.sort(
+            key=lambda item: (-float(item["score"]), str(item["group_path"]))
+        )
+
+        selected = candidates[:group_limit]
+        prepared_groups: list[dict[str, Any]] = []
+        partial = False
+        for candidate in selected:
+            group_path = str(candidate["group_path"])
+            sync = self.kb_sync(group_path=group_path)
+            partial = partial or sync["status"] != "ok"
+            context = self.kb_get_group_context(
+                group_path,
+                max_chars=context_limit,
+            )
+            note = self.kb_get_knowledge_note(group_path, max_chars=2_000)
+            searches: list[dict[str, Any]] = []
+            for term in terms[:8]:
+                result = self.kb_search(term, group_path=group_path, limit=10)
+                searches.append(
+                    {
+                        "query": term,
+                        "count": result["count"],
+                        "hits": result["hits"],
+                    }
+                )
+            prepared_groups.append(
+                {
+                    **candidate,
+                    "sync": sync,
+                    "knowledge_note_status": note["status"],
+                    "knowledge_note_digest": note["digest"],
+                    "knowledge_note_wikilinks": note["wikilinks"],
+                    "searches": searches,
+                    "context": context,
+                    "requires_note_synthesis": note["status"] == "missing",
+                }
+            )
+
+        status = "no_match" if not selected else ("partial" if partial else "ok")
+        return {
+            "status": status,
+            "query": clean_query,
+            "search_terms": terms,
+            "required_terms": required,
+            "scanned_pdf_count": len(discovered),
+            "candidate_group_count": len(candidates),
+            "selected_group_count": len(selected),
+            "candidate_groups": candidates[:50],
+            "prepared_groups": prepared_groups,
+            "pending_knowledge_notes": [
+                item["knowledge_note"]
+                for item in prepared_groups
+                if item["requires_note_synthesis"]
+            ],
+            "next_action": (
+                "Synthesize each prepared group from page-located context with the two "
+                "workflow agents, then call kb_write_knowledge_note with apply=false."
+                if selected
+                else "Refine search_terms or verify the configured vault path."
+            ),
+            "rules": {
+                "whole_vault_fulltext_sync_performed": False,
+                "selected_groups_synced": True,
+                "knowledge_notes_written": False,
+                "preview_required_before_write": True,
+            },
+        }
 
     def _knowledge_note_path(self, group_path: str) -> tuple[str, Path]:
         group = normalize_group_path(group_path)

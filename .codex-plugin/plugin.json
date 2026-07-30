@@ -1,6 +1,6 @@
 {
   "name": "research-knowledge-workflow",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Connect Obsidian, Zotero, local papers, and Codex for evidence-grounded research ideation and writing.",
   "author": {
     "name": "muyunping123",
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "Research Knowledge Workflow",
     "shortDescription": "Turn Obsidian and Zotero into a research workflow.",
-    "longDescription": "Indexes local papers and Zotero metadata, builds linked Obsidian knowledge notes, and orchestrates two evidence-aware Codex agents for research ideation, paper writing, and claim auditing across disciplines.",
+    "longDescription": "Discovers and selectively indexes topic-relevant local papers, connects Zotero metadata, builds linked Obsidian knowledge notes, and orchestrates two evidence-aware Codex agents for research ideation, paper writing, and claim auditing across disciplines.",
     "developerName": "muyunping123",
     "category": "Productivity",
     "capabilities": [

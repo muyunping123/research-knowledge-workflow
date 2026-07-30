@@ -46,7 +46,7 @@ Treat all four modes as substantive. Setup explanations and deterministic applic
 
 1. Resolve the mode, target, configured roots, output language, discipline, and requested write scope.
 2. Ask only for information that cannot be safely inferred, especially an ambiguous target or missing write permission.
-3. Use the MCP to retrieve task-relevant local PDFs, notes, Zotero records, and manuscript context. For `build-knowledge`, sync only the selected directory subtree unless the user explicitly requests a whole-vault refresh.
+3. Use the MCP to retrieve task-relevant local PDFs, notes, Zotero records, and manuscript context. A note or cache miss is not a local-library miss: call `kb_prepare_topic` with the topic plus bounded Chinese/English synonyms to discover unindexed PDFs by filename and directory, selectively sync only the strongest candidate groups, and retrieve their page-addressable context. Pass the task's domain or research-object vocabulary as `required_terms` when a broad concept such as multimodal, optimization, or causality would otherwise cross unrelated disciplines. Never run a whole-vault full-text sync merely because notes are missing.
 4. Normalize provenance without forcing local PDFs and Zotero records into one-to-one relationships.
 5. Build and freeze an evidence pack following `evidence-schema.md`. Record its digest, limitations, and retrieval trace.
 6. Start exactly two agents with the mode-specific roles below and send each the identical frozen pack.
@@ -60,7 +60,7 @@ Treat all four modes as substantive. Setup explanations and deterministic applic
 
 Use the roles **Local Literature Reader** and **Cross-Link Auditor**.
 
-1. Use the MCP to group local PDFs by parent directory relative to the configured PDF root.
+1. If the user supplies a directory, sync only that subtree. If the user supplies a topic or an Obsidian search has no adequate note, call `kb_prepare_topic`; review its ranked groups and use the selectively indexed full-text context instead of concluding that the local library has no evidence.
 2. Join the relative parent path components with `_` and add `.md`. For example, `机器学习/多视图/渐进融合/*.pdf` maps to `机器学习_多视图_渐进融合.md`.
 3. Leave every PDF in place. Retrieve page-addressable text in bounded batches and preserve each source's vault-relative path.
 4. Read the target note and search nearby topic notes through the MCP. Include their digests and current wikilinks in the evidence pack as non-evidentiary leads.
@@ -71,11 +71,13 @@ Use the roles **Local Literature Reader** and **Cross-Link Auditor**.
 9. Preview the full new note or a bounded update diff. Never overwrite manual content or resolve a filename collision silently.
 10. Save through the MCP only after approval. For an existing generated note, pass the preview-time digest so concurrent edits become conflicts instead of data loss.
 
+For topic-directed preparation, generate one preview per selected parent-directory group. `kb_prepare_topic` may update only the derived local index; it never writes a Markdown note. Use its `pending_knowledge_notes`, full-text context, and cursors with the same two agents, then preview each note through `kb_write_knowledge_note(apply=false)`.
+
 ## Modes: Ideate, Write, Audit
 
 Use the roles **Idea Builder** and **Evidence-Constrained Writer**.
 
-Retrieve in this order: active manuscript context, linked Obsidian notes, local full text, Zotero metadata, then narrowly scoped external evidence when required. A Zotero attachment is only an availability signal until its text has been retrieved. If a relevant item has metadata but no retrieved full text, invoke an installed `$gs-search`, `$gs-fulltext`, or `$academic-search` workflow only for that active item and verify the result. Never bulk fill the Zotero library.
+Retrieve in this order: active manuscript context, linked Obsidian notes, topic-directed local PDF discovery and full text, Zotero metadata, then narrowly scoped external evidence when required. If note retrieval is empty or incomplete, run `kb_prepare_topic` before reporting a local no-hit. When a selected group lacks a note, include a knowledge-note preview as a navigation artifact while keeping every factual claim tied to the PDF pages. A Zotero attachment is only an availability signal until its text has been retrieved. If a relevant item has metadata but no retrieved full text, invoke an installed `$gs-search`, `$gs-fulltext`, or `$academic-search` workflow only for that active item and verify the result. Never bulk fill the Zotero library.
 
 ### Ideate
 

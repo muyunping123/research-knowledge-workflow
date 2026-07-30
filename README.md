@@ -9,6 +9,7 @@
 ## 核心能力
 
 - **构建知识库**：按本地论文目录聚合全文，生成带来源定位和双向链接的 Obsidian 主题笔记。
+- **主题定向发现**：知识笔记没有命中时，回查整个本地 PDF 目录的文件名与分类路径，只索引相关正文并生成待审阅笔记。
 - **提炼研究思路**：从已有文献中识别问题、争议、机制、方法缺口和可检验的研究问题。
 - **辅助论文撰写**：基于证据包起草或修改 Markdown、Word、LaTeX 论文内容。
 - **审计论证与引用**：检查主张是否有正文或摘要支撑，区分事实、推断、假设和待补证据。
@@ -83,7 +84,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install.ps1 `
 
 安装脚本会创建隔离的 Python 环境，将新配置写入 `%APPDATA%\research-knowledge-workflow\config.toml`，并把 SQLite 派生缓存保存在 `%LOCALAPPDATA%\research-knowledge-workflow`。将仓库添加为本地 Codex Plugin 后，重新加载 Codex 并新建任务，使 Skill 与 MCP 重新发现。
 
-首次运行建议只同步一个相对目录，例如 `机器学习/多视图/渐进融合`，确认预览符合预期后再扩大范围。
+首次运行可以指定一个相对目录，也可以给出研究主题，由 `kb_prepare_topic` 轻量扫描 PDF 文件名和目录路径后只同步最相关的分类。它不会因为笔记缺失而解析整个 Vault。
 
 ## 配置说明
 
@@ -124,6 +125,22 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install.ps1 `
 ```
 
 检查预览中的来源清单、综合结论、冲突和 `[[双向链接]]`。内容正确后回复“确认写入该笔记”，父任务才会重新校验目标并应用修改。
+
+不知道论文所在目录时，直接按主题构建：
+
+```text
+使用 $research-knowledge-workflow 的 build-knowledge 模式，以“多模态信息与营销”为主题检索本地论文库。使用“多模态、营销、直播、multimodal、marketing、live commerce、sales prediction”等中英文检索词，只同步最相关的目录，读取正文并生成 Obsidian 知识笔记预览，不要直接写入。
+```
+
+此时工作流先搜索已有笔记；命中不足时调用 `kb_prepare_topic`：
+
+1. 只扫描 Vault 中 PDF 的文件名和相对目录，不做全库全文解析。
+2. 用 `required_terms` 限定研究对象或领域，再按主题词覆盖率排列候选目录。例如“多模态营销”要求至少命中“营销、marketing、sales、commerce”之一，避免误选多模态医学或谣言检测目录。
+3. 只增量索引选中的目录，并返回带页码的正文批次。
+4. 固定两个 Agent 基于正文生成每个目录对应的知识笔记。
+5. 通过 `kb_write_knowledge_note(apply=false)` 返回完整预览，确认后才写入 Obsidian。
+
+因此，“Obsidian 笔记没有命中”只表示综合笔记尚未建立，不再被解释为“本地论文库没有相关正文”。
 
 ### 第四步：提炼研究思路
 
@@ -197,7 +214,7 @@ Codex 会返回可审阅的段落、主张台账和引用定位。确认内容�
 当研究问题属于经管学科时，可以显式启用 `ai4management`：
 
 ```text
-使用 $research-knowledge-workflow 和 $ai4management，研究多模态信息如何影响直播带货效果预测。基于本地知识库提炼管理情境、决策主体、机制、方法设计和可证伪假设，并保持所有事实主张可追溯。
+使用 $research-knowledge-workflow 和 $ai4management，研究多模态信息如何影响直播带货效果预测。先定向检索本地论文目录并为缺失分类生成知识笔记预览，再基于正文提炼管理情境、决策主体、机制、方法设计和可证伪假设，并保持所有事实主张可追溯。
 ```
 
 `ai4management` 只提供领域推理和审计框架，不作为文献证据，也不会额外创建第三个 Agent。

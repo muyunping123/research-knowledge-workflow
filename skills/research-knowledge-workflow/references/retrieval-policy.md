@@ -23,9 +23,9 @@ Use this policy for local knowledge construction, research ideation, manuscript 
 
 ## Local Knowledge Build
 
-1. Discover configured PDF roots through the MCP.
+1. Discover configured PDF roots through the MCP. For a topic rather than an explicit directory, use `kb_prepare_topic` with bounded bilingual synonyms so unindexed PDFs can be found from filenames and relative paths. Use `required_terms` for the domain or research object when the main concept is cross-disciplinary.
 2. Group PDFs by relative parent directory, not by Zotero collection.
-3. Build one bounded evidence pack per directory group or batch.
+3. Selectively index only the strongest candidate groups, retrieve page-addressable context, and build one bounded evidence pack per directory group or batch. A Markdown-note miss must not bypass this local-PDF step.
 4. Include an existing target note and nearby category notes so links can be audited.
 5. Extract page-addressable text for analysis. If OCR or parsing is incomplete, mark the affected pages and lower confidence.
 6. Do not search externally merely to make every local PDF complete.
@@ -37,11 +37,12 @@ Use the following order unless the task clearly requires another sequence:
 
 1. Read the active project target, adjacent text, terminology, existing citations, and requested scope.
 2. Search Obsidian filenames, frontmatter, aliases, tags, links, and note text for candidate concepts and papers.
-3. Resolve promising note leads to local PDF pages.
-4. Search Zotero metadata and available attachments independently for additional candidates and citation identity.
-5. Verify only task-relevant metadata-only candidates through an installed scholarly-search skill.
-6. Run external prior-art search when assessing novelty or when local evidence is insufficient for a material claim.
-7. Freeze the selected evidence and its limitations before dispatching the two agents.
+3. Resolve promising note leads to local PDF pages. If notes are absent or insufficient, call `kb_prepare_topic` to scan the complete PDF catalog without extracting the complete vault, selectively index ranked parent-directory groups, and retrieve bounded full-text context.
+4. Generate or update missing group knowledge notes as previews from that full-text context; notes remain navigation leads and require explicit approval before writing.
+5. Search Zotero metadata and available attachments independently for additional candidates and citation identity.
+6. Verify only task-relevant metadata-only candidates through an installed scholarly-search skill.
+7. Run external prior-art search when assessing novelty or when local evidence is insufficient for a material claim.
+8. Freeze the selected evidence and its limitations before dispatching the two agents.
 
 ## Optional PDF-Zotero Association
 
@@ -101,6 +102,7 @@ Stop retrieval when the evidence pack covers the requested claims, the configure
 
 - Zotero unavailable: continue with local notes and PDFs; mark citation coverage incomplete.
 - PDF parsing failed: retain metadata and file provenance; do not invent text or pages.
-- Obsidian unavailable: continue with local sources exposed by MCP; do not claim link coverage.
+- Obsidian note unavailable: run topic-directed local PDF discovery before external retrieval; continue with page-located PDFs and mark the missing note for preview generation.
+- Obsidian Vault unavailable: continue only with other configured sources; do not claim local PDF or link coverage.
 - Scholarly search unavailable: keep metadata-only candidates and set novelty to `not_assessed` where applicable.
 - Conflicting versions: keep both records and identify which version supports each claim.
